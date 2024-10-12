@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define a função que será adicionada ao ./.bashrc
-# a string tb ser[a usada no grep para conferir se j[a existe no arquivo
+# a string tb será usada no grep para conferir se já existe no arquivo
 
 JOT_FUNCTION="jot() {
     \"$HOME/jot.sh\" \"\$@\"
