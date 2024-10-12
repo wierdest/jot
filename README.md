@@ -8,7 +8,7 @@ A simple Bash script for a truly minimal command-line logging utility.
 ```
 # Custom jot function. jot is a logging utility. jot -h for more info.
 jot() {
-    "/home/andre/jot.sh" "$@"
+    "$HOME/jot.sh" "$@"
     history -d $(history 1)
     sed -i '$d' ~/.bash_history
 }
