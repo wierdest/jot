@@ -104,7 +104,7 @@ clear_logs() {
 show_help() {
     echo "Usage: $0 [options]"
     echo "Options :"
-    echo " -a 'press Enter' Add a new log entry"
+    echo " -a 'press enter' Add a new log entry"
     echo " -l View last entry"
     echo " -t View today's entries"
     echo " -y View yesterday's entries"
