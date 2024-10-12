@@ -119,7 +119,7 @@ show_help() {
 while getopts "altyvr:s:dch" option; do
     case $option in
         a)
-           echo "jot your log message (Press Enter twice to finish):"
+           echo "jot log message (Press Enter twice to finish):"
             log_message=""
             while IFS= read -r line; do
                 # If the line is empty, break the loop

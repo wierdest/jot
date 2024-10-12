@@ -29,7 +29,7 @@ Now you can type `jot -h` to find out about usage.
 
 ## Usage
 
-- -a 'log entry' : Add a new log entry.
+- -a <Enter> : enter jot log message prompt.
 - -v : View all log entries.
 - -s 'keyword' : Search log entries for a specific keyword.
 - -c : Clear all log entries.
