@@ -119,8 +119,11 @@ show_help() {
 while getopts "a:ltyvr:s:dch" option; do
     case $option in
         a)
-            log_message="${@:2}"
+            # captura tudo após o argumento -a 
+            shift $((OPTIND - 2 ))
+            log_message="$*"
             add_log "$log_message"
+            break
             ;;
         l)
 	        view_last
