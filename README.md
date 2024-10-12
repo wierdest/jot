@@ -29,11 +29,11 @@ Now you can type `jot -h` to find out about usage.
 
 ## Usage
 
--a 'log entry' : Add a new log entry.
--v : View all log entries.
--s 'keyword' : Search log entries for a specific keyword.
--c : Clear all log entries.
--t : View logs from today.
--y : View logs from yesterday.
--d : Delete the last log entry.
--h : Show help information.
+- -a 'log entry' : Add a new log entry.
+- -v : View all log entries.
+- -s 'keyword' : Search log entries for a specific keyword.
+- -c : Clear all log entries.
+- -t : View logs from today.
+- -y : View logs from yesterday.
+- -d : Delete the last log entry.
+- -h : Show help information.
