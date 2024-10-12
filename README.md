@@ -38,7 +38,7 @@ Now you can type `jot -h` to find out about usage.
 - -d : Delete the last log entry.
 - -h : Show help information.
 
-## Example output
+## Example output of jot -v
 ```
 2024-10-12 20:11:36 - Today I created jot.
 2024-10-12 20:11:58 - jot is a truly minimalistic command-line personal logging tool.
