@@ -6,7 +6,7 @@ A simple Bash script for a truly minimal command-line logging utility.
 - it's a very simple Bash script.
 - it comes with a installer script that automates the creation of a function
 ```
-# Custom jot function. jot is a logging utility. jot -h for more info.
+# jot is a logging utility. jot -h for usage info.
 jot() {
     "$HOME/jot.sh" "$@"
     history -d $(history 1)

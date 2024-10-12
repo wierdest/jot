@@ -1,8 +1,10 @@
 #!/bin/bash
-
-# This was made by wierdest - Andre Luiz Pinheiro Torres as a way of starting to learn bash
+# jot is a minimal command-line logging tool.
+# jot was made by wierdest - Andre Luiz Pinheiro Torres dos Santos 
+# andrlzpt@protonmail.com
+# as a way of learning the basics of bash
 # it was made in oct 12 2024
-
+# code provided as-is with no warranty whatsoever - comments in Portuguese, 'tis a learning project afterall
 
 
 # Arquivo do log
@@ -54,6 +56,19 @@ view_yesterday() {
 
 }
 
+# Lê os logs escritos recentemente
+view_recent() {
+    if [[ -s $LOG_FILE ]]; then
+        if [[ $1 =~ ^[0-9]+$ && $1 -gt 0 ]]; then
+	        tail -n "$1" "$LOG_FILE"
+        else
+            echo "Please provide a valid positive number corresponding to the number of entries you would like to view."
+        fi
+    else
+	echo "Log file is empty."
+    fi
+}
+
 # Pesquisa os logs
 search_logs() {
     grep -i "$1" "$LOG_FILE"
@@ -88,41 +103,45 @@ clear_logs() {
 show_help() {
     echo "Usage: $0 [options]"
     echo "Options :"
-    echo " -a 	'log entry'	Add a new log entry"
-    echo " -l 			View last entry"
-    echo " -t			View today's entries"
-    echo " -y			View yesterday's entries"
-    echo " -v			View all log entries"
-    echo " -s 	'keyword'   	Search log entries for keyword"
-    echo " -d			Clear last log entry" 
-    echo " -c             	Clear all log entries with no warning BEWARE!"
+    echo " -a 'log entry' Add a new log entry"
+    echo " -l View last entry"
+    echo " -t View today's entries"
+    echo " -y View yesterday's entries"
+    echo " -v View all log entries"
+    echo " -r 'n' View a number n of recent entries" 
+    echo " -s 'keyword' Search log entries for keyword"
+    echo " -d Clear last log entry" 
+    echo " -c Clear all log entries with no warning BEWARE!"
 }
 
 # Usa getopts para parse das opções
-while getopts "a:ltyvs:dch" option; do
+while getopts "a:ltyvr:s:dch" option; do
     case $option in
         a)
             log_message="${@:2}"
             add_log "$log_message"
             ;;
         l)
-	    view_last
-	    ;;
-	t)
-	   view_today
-	    ;;
-	y)
-	   view_yesterday
-	    ;;
+	        view_last
+	        ;;
+	    t)
+	        view_today
+	        ;;
+	    y)
+	        view_yesterday
+	        ;;
         v)
             view_all
+            ;;
+        r)
+            view_recent "$OPTARG"
             ;;
         s)
             search_logs "$OPTARG"
             ;;
-	d)
-	    clear_last
-	    ;;
+	    d)
+	        clear_last
+	        ;;
         c)
             clear_logs
             ;;
