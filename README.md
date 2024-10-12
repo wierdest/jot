@@ -37,3 +37,23 @@ Now you can type `jot -h` to find out about usage.
 - -y : View logs from yesterday.
 - -d : Delete the last log entry.
 - -h : Show help information.
+
+## Example output
+```
+2024-10-12 20:11:36 - Today I created jot.
+2024-10-12 20:11:58 - jot is a truly minimalistic command-line personal logging tool.
+2024-10-12 20:13:39 - jot does not use any external editor and works as a prompt tool. Although you can add multiple lines, jot philosophy recommends simplicity.
+2024-10-12 20:14:22 - jot's core belief is that a useful log is a line-by-line log.
+2024-10-12 20:15:07 - jot a minimal quick log journaling command prompt tool written in Bash!
+2024-10-12 20:15:43 - jot has a few viewing and searching capabilities that are being constantly enchanced.
+2024-10-12 20:16:37 - the idea is to go jot -a and press enter.
+2024-10-12 20:17:25 - this will take you to the jot your log message prompt where you will be able to jot your log message.
+2024-10-12 20:18:15 - jot provides a searching function using the grep command.
+2024-10-12 20:18:44 - just go jot -s <insert search term>
+2024-10-12 20:18:55 - and you will see.
+2024-10-12 20:28:02 - after a few more adjustments I think it's running pretty smoothly now...
+2024-10-12 20:28:34 - jot is working pretty well.
+2024-10-12 20:28:56 - I think it might suit my needs well...
+2024-10-12 20:29:21 - I hope I get to use it in my work. Or maybe to write poems and stuff.
+
+```
