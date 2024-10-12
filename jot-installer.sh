@@ -15,7 +15,7 @@ then
     echo "The 'jot' function is already present in .bashrc."
 else
     echo "Adding 'jot' function to .bashrc. jot is a logging utility. jot -h for more info."
-    echo -e "\n# Custom jot function. jot is a logging utility. jot -h for more info.\n$JOT_FUNCTION" >> ~/.bashrc
+    echo -e "\n# jot is a logging utility. jot -h for more info.\n$JOT_FUNCTION" >> ~/.bashrc
     echo "The 'jot' function has been added to .bashrc."
 fi
 
