@@ -116,14 +116,23 @@ show_help() {
 }
 
 # Usa getopts para parse das opções
-while getopts "a:ltyvr:s:dch" option; do
+while getopts "altyvr:s:dch" option; do
     case $option in
         a)
-            # captura tudo após o argumento -a 
-            shift $((OPTIND - 2 ))
-            log_message="$*"
-            add_log "$log_message"
-            break
+           echo "jot your log message (Press Enter twice to finish):"
+            log_message=""
+            while IFS= read -r line; do
+                # If the line is empty, break the loop
+                [[ -z "$line" ]] && break
+                log_message+="$line "
+            done
+            # Trim trailing space from log_message
+            log_message=$(echo "$log_message" | sed 's/[[:space:]]*$//')
+            if [[ -n "$log_message" ]]; then
+                add_log "$log_message"
+            else
+                echo "No log message entered. Please provide a message."
+            fi
             ;;
         l)
 	        view_last
