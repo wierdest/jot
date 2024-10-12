@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # jot is a minimal command-line logging tool.
 # jot was made by wierdest - Andre Luiz Pinheiro Torres dos Santos 
 # andrlzpt@protonmail.com
