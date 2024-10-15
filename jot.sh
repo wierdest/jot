@@ -9,19 +9,46 @@
 
 
 # Arquivo do log
-LOG_FILE="jot.txt"
+# centralização em um arquivo na pasta pessoal do usuário
+LOG_FILE="$HOME/jot.txt"
+
+# verde para o timestamp
+BLACK="\e[30m"
+RED="\e[31m"
+GREEN="\e[32m"
+YELLOW="\e[33m"
+BLUE="\e[34m"
+MAGENTA="\e[35m"
+CYAN="\e[36m"
+WHITE="\e[37m"
+
+# cor padrão para o
+RESET="\e[0m"
+# formato do nosso timestamp
+TIMESTAMP="$(date '+%Y-%m-%d %H:%M:%S')"
 
 # Adiciona um log
 add_log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$LOG_FILE"
-    echo "Log added: $1"
+    echo "${TIMESTAMP} - $1" >> "$LOG_FILE"
+    echo -e "Log added: ${GREEN}$1${RESET}"
 }
 
 # Lê todos os logs
 view_all() {
     # isso testa se o arquivo existe e size is > 0
     if [[ -s $LOG_FILE ]]; then
-        cat "$LOG_FILE"
+        while IFS= read -r line; do
+            # extrai o time stamp e a mensagem da linha
+            # awk é usado para extrair os dois primeiros itens (a data e a hora)
+            TIMESTAMP="$(echo "$line" | awk '{print $1, $2}')"
+            # cut, com o -delimitador ' ' e com o range -f3-, cortando tudo do terceiro campo em diante
+            # a gente precisa do -d do cut para marcar que o delimitador será o espaco, 
+            # que delimita a data, a hora e o - separador.
+            MESSAGE="$(echo "$line" | cut -d' ' -f3-)"
+            
+            # Print the timestamp in green and the message in default color
+            echo -e "${YELLOW}${TIMESTAMP}${RESET} ${MESSAGE}"
+        done < "$LOG_FILE"
     else
         echo "Log file is empty."
     fi
@@ -95,10 +122,10 @@ clear_last() {
 
 # Limpa todos os logs
 clear_logs() {
-    > "$LOG_FILE"
+    # usa noop operator como o linter sugeriu
+    : > "$LOG_FILE"
     echo "Log entries cleared!"
 }
-
 
 # Mostra ajuda de utilização
 show_help() {
@@ -122,12 +149,12 @@ while getopts "altyvr:s:dch" option; do
            echo "jot log message (Press Enter twice to finish):"
             log_message=""
             while IFS= read -r line; do
-                # If the line is empty, break the loop
+                # se a linha é vazia, sai do loop
                 [[ -z "$line" ]] && break
                 log_message+="$line "
             done
-            # Trim trailing space from log_message
-            log_message=$(echo "$log_message" | sed 's/[[:space:]]*$//')
+            # limpa espaços vazios, usando o que o linter sugeriu
+            log_message=${log_message%"${log_message##*[![:space:]]}"}
             if [[ -n "$log_message" ]]; then
                 add_log "$log_message"
             else

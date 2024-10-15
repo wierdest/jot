@@ -19,13 +19,15 @@ in your ./.bashrc
 
 ## Installation
 1. Download jot.sh
-2. Place it in your $HOME for ease of use or wherever you like
+2. Place it in your $HOME.
 2. Make it executable `chmod +x ~/jot.sh`
 3. Download the jot-installer.sh
 4. Make the installer executable `chmod +x ~/jot-installer.sh`
 5. Run the installer `./jot-installer.sh`
 
 Now you can type `jot -h` to find out about usage.
+
+jot creates a jot.txt file in your $HOME, that's where it keeps all your jots.
 
 ## Usage
 
