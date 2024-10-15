@@ -38,9 +38,8 @@ view_all() {
     
     # pega a data de hoje para imprimir as jots de hj em amarelo
     today=$(date '+%Y-%m-%d')
-    # uma hora atrás imprimi em amarelo
-    one_hour_ago=$(date -d "1 hour ago" '+%H')
-    # isso testa se o arquivo existe e size is > 0
+    # até uma hora atrás imprimi em amarelo
+    current_hour=$(date '+%H')
     if [[ -s $LOG_FILE ]]; then
         while IFS= read -r line; do
             # extrai o time stamp e a mensagem da linha
@@ -58,7 +57,7 @@ view_all() {
             if [[ "$log_date" == "$today" ]]; then
                 # se for hoje faz o print em BLUE
                 # a não ser que seja na última hora, ocasião que faz o print em YELLOW
-                if [[ "$log_hour" == "$one_hour_ago" ]]; then
+                if [[ "$log_hour" == "$current_hour" ]]; then
                     echo -e "${YELLOW}${log_date} ${log_time}${RESET} ${message}"
                 else
                     echo -e "${BLUE}${log_date} ${log_time}${RESET} ${message}"
