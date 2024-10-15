@@ -35,19 +35,38 @@ add_log() {
 
 # Lê todos os logs
 view_all() {
+    
+    # pega a data de hoje para imprimir as jots de hj em amarelo
+    today=$(date '+%Y-%m-%d')
+    # uma hora atrás imprimi em amarelo
+    one_hour_ago=$(date -d "1 hour ago" '+%H')
     # isso testa se o arquivo existe e size is > 0
     if [[ -s $LOG_FILE ]]; then
         while IFS= read -r line; do
             # extrai o time stamp e a mensagem da linha
             # awk é usado para extrair os dois primeiros itens (a data e a hora)
-            TIMESTAMP="$(echo "$line" | awk '{print $1, $2}')"
+            # poderia ser cut -d ' ' -f1-2
+            log_date=$(echo "$line" | awk '{print $1}')
+            log_time=$(echo "$line" | awk '{print $2}')
+            # extrai a hora do time
+            log_hour=$(echo "$log_time" | cut -d':' -f1)
             # cut, com o -delimitador ' ' e com o range -f3-, cortando tudo do terceiro campo em diante
             # a gente precisa do -d do cut para marcar que o delimitador será o espaco, 
             # que delimita a data, a hora e o - separador.
-            MESSAGE="$(echo "$line" | cut -d' ' -f3-)"
-            
-            # Print the timestamp in green and the message in default color
-            echo -e "${YELLOW}${TIMESTAMP}${RESET} ${MESSAGE}"
+            message=$(echo "$line" | cut -d' ' -f3-)
+
+            if [[ "$log_date" == "$today" ]]; then
+                # se for hoje faz o print em BLUE
+                # a não ser que seja na última hora, ocasião que faz o print em YELLOW
+                if [[ "$log_hour" == "$one_hour_ago" ]]; then
+                    echo -e "${YELLOW}${log_date} ${log_time}${RESET} ${message}"
+                else
+                    echo -e "${BLUE}${log_date} ${log_time}${RESET} ${message}"
+                fi
+            else
+                # se for ontem ou anterior
+                echo -e "${MAGENTA}${log_date} ${log_time}${RESET} ${message}"
+            fi
         done < "$LOG_FILE"
     else
         echo "Log file is empty."
@@ -57,7 +76,10 @@ view_all() {
 # Lê a última entrada
 view_last() {
    if [[ -s $LOG_FILE ]]; then 
-	tail -n 1 "$LOG_FILE"
+	last_log=$(tail -n 1 "$LOG_FILE")
+    timestamp=$(echo "$last_log" | cut -d' ' -f1-2)
+    message=$(echo "$last_log" | cut -d' ' -f3-)
+    echo -e "${RED}${timestamp}${RESET} ${message}"
    else
 	echo "Log file is empty"
    fi
