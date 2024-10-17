@@ -27,48 +27,87 @@ RESET="\e[0m"
 # formato do nosso timestamp
 TIMESTAMP="$(date '+%Y-%m-%d %H:%M:%S')"
 
+
 # Adiciona um log
 add_log() {
     echo "${TIMESTAMP} - $1" >> "$LOG_FILE"
-    echo -e "Log added: ${GREEN}$1${RESET}"
+    echo -e "${CYAN}Log added:${RESET} ${GREEN}$1${RESET}"
+}
+
+# Imprime o log de acordo com o esquema de cor geral: MAGENTA para velhas, BLUE para hj e YELLOW para a ultima hora
+print_general_log_line() {
+    # pega a data de hoje para imprimir as jots de hj em amarelo
+    today=$(date '+%Y-%m-%d')
+    # até uma hora atrás imprime em amarelo
+    current_hour=$(date '+%H')
+    # extrai o time stamp e a mensagem da linha
+    # awk é usado para extrair os dois primeiros itens (a data e a hora)
+    # poderia ser cut -d ' ' -f1-2
+    log_date=$(echo "$1" | awk '{print $1}')
+    log_time=$(echo "$1" | awk '{print $2}')
+    # extrai a hora do time
+    log_hour=$(echo "$log_time" | cut -d':' -f1)
+    # cut, com o -delimitador ' ' e com o range -f3-, cortando tudo do terceiro campo em diante
+    # a gente precisa do -d do cut para marcar que o delimitador será o espaco, 
+    # que delimita a data, a hora e o - separador.
+    message=$(echo "$1" | cut -d' ' -f3-)
+    if [[ "$log_date" == "$today" ]]; then
+        # se for hoje faz o print em BLUE
+        # a não ser que seja na última hora, ocasião que faz o print em YELLOW
+        if [[ "$log_hour" == "$current_hour" ]]; then
+            echo -e "${YELLOW}${log_date} ${log_time}${RESET} ${message}"
+        else
+            echo -e "${BLUE}${log_date} ${log_time}${RESET} ${message}"
+        fi
+    else
+        # se for ontem ou anterior
+        echo -e "${MAGENTA}${log_date} ${log_time}${RESET} ${message}"
+    fi
+}
+
+# Imprime o log de acordo com o esquema de cor para intervalo recente: MAGENTA para velhas BLUE para as de até 3 horas e YELLOW para a ultima hora
+print_recent_log_line() {
+    # Pega a hora atual
+    current_hour=$(date '+%H')
+    # Define o limite de 3 horas atrás
+    three_hours_ago=$(date --date='-3 hour' '+%H')
+
+    # extrai o time stamp e a mensagem da linha
+    log_time=$(echo "$1" | awk '{print $2}')
+    log_hour=$(echo "$log_time" | cut -d':' -f1)
+    message=$(echo "$1" | cut -d' ' -f3-)
+
+    # Verifica se a hora do log é da última hora
+    if [[ "$log_hour" == "$current_hour" ]]; then
+        echo -e "${YELLOW}${log_time}${RESET} ${message}"
+    # Verifica se é dentro das últimas 3 horas
+    elif [[ "$log_hour" -ge "$three_hours_ago" && "$log_hour" -lt "$current_hour" ]]; then
+        echo -e "${BLUE}${log_time}${RESET} ${message}"
+    # Logs mais antigos que 3 horas
+    else
+        echo -e "${MAGENTA}${log_time}${RESET} ${message}"
+    fi
+}
+
+# Imprime uma mensagem que diz Log file is empty
+print_empty() {
+    # -e permite a leitura de newline \n, tab \t ou codigos de cor
+    echo -e "${RED}Log file is empty.${RESET}"
+}
+
+# Imprime uma mensagem que dis jot log message (Press Enter twice to finish):
+print_header() {
+    echo -e "${CYAN}jot log message (Press Enter twice to finish):${RESET}"
 }
 
 # Lê todos os logs
 view_all() {
-    
-    # pega a data de hoje para imprimir as jots de hj em amarelo
-    today=$(date '+%Y-%m-%d')
-    # até uma hora atrás imprimi em amarelo
-    current_hour=$(date '+%H')
     if [[ -s $LOG_FILE ]]; then
         while IFS= read -r line; do
-            # extrai o time stamp e a mensagem da linha
-            # awk é usado para extrair os dois primeiros itens (a data e a hora)
-            # poderia ser cut -d ' ' -f1-2
-            log_date=$(echo "$line" | awk '{print $1}')
-            log_time=$(echo "$line" | awk '{print $2}')
-            # extrai a hora do time
-            log_hour=$(echo "$log_time" | cut -d':' -f1)
-            # cut, com o -delimitador ' ' e com o range -f3-, cortando tudo do terceiro campo em diante
-            # a gente precisa do -d do cut para marcar que o delimitador será o espaco, 
-            # que delimita a data, a hora e o - separador.
-            message=$(echo "$line" | cut -d' ' -f3-)
-
-            if [[ "$log_date" == "$today" ]]; then
-                # se for hoje faz o print em BLUE
-                # a não ser que seja na última hora, ocasião que faz o print em YELLOW
-                if [[ "$log_hour" == "$current_hour" ]]; then
-                    echo -e "${YELLOW}${log_date} ${log_time}${RESET} ${message}"
-                else
-                    echo -e "${BLUE}${log_date} ${log_time}${RESET} ${message}"
-                fi
-            else
-                # se for ontem ou anterior
-                echo -e "${MAGENTA}${log_date} ${log_time}${RESET} ${message}"
-            fi
+            print_general_log_line "$line"
         done < "$LOG_FILE"
     else
-        echo "Log file is empty."
+        print_empty
     fi
 }
 
@@ -76,21 +115,27 @@ view_all() {
 view_last() {
    if [[ -s $LOG_FILE ]]; then 
 	last_log=$(tail -n 1 "$LOG_FILE")
-    timestamp=$(echo "$last_log" | cut -d' ' -f1-2)
-    message=$(echo "$last_log" | cut -d' ' -f3-)
-    echo -e "${RED}${timestamp}${RESET} ${message}"
+    print_general_log_line "$last_log"
    else
-	echo "Log file is empty"
+	print_empty
    fi
 }
 
 # Lê os logs escritos hoje
 view_today() {
    if [[ -s $LOG_FILE ]]; then
-	today=$(date '+%Y-%m-%d')
-	grep "^$today" "$LOG_FILE" || echo "No log entries for today."
+        today=$(date '+%Y-%m-%d')
+        today_logs=$(grep "^$today" "$LOG_FILE")
+
+        if [[ -n $today_logs ]]; then
+            while IFS= read -r line; do
+                print_recent_log_line "$line"
+            done <<< "$today_logs"
+        else
+            echo -e "${RED}No log entries for today.${RESET}"
+        fi
    else
-	echo "Log file is empty"
+	print_empty
    fi
 }
 
@@ -98,9 +143,9 @@ view_today() {
 view_yesterday() {
    if [[ -s $LOG_FILE ]]; then
 	yesterday=$(date -d "yesterday" '+%Y-%m-%d')
-	grep "^$yesterday" "$LOG_FILE" || echo "No log entries for yesterday."
+	grep "^$yesterday" "$LOG_FILE" || echo -e "${RED}No log entries for yesterday.${RESET}"
    else
-	echo "Log file is empty"
+	print_empty
    fi 
 
 }
@@ -109,7 +154,13 @@ view_yesterday() {
 view_recent() {
     if [[ -s $LOG_FILE ]]; then
         if [[ $1 =~ ^[0-9]+$ && $1 -gt 0 ]]; then
-	        tail -n "$1" "$LOG_FILE"
+	        recent_logs=$(tail -n "$1" "$LOG_FILE")
+            # Lê a linha a linha do texto guardado na variável!
+            while IFS= read -r line; do
+                print_recent_log_line "$line"
+            # O operador <<< "here string" redireciona uma string diretamente no standard input, 
+            # enquanto que o < redireciona um arquivo
+            done <<< "$recent_logs" 
         else
             echo "Please provide a valid positive number corresponding to the number of entries you would like to view."
         fi
@@ -128,7 +179,6 @@ search_logs() {
     fi
 }
 
-
 # Limpa o último log
 clear_last() {
    if [[ -s $LOG_FILE ]]; then
@@ -139,7 +189,6 @@ clear_last() {
 	echo "Log file is empty! Nothing to delete!"
    fi
 }
-
 
 # Limpa todos os logs
 clear_logs() {
@@ -167,7 +216,7 @@ show_help() {
 while getopts "altyvr:s:dch" option; do
     case $option in
         a)
-           echo "jot log message (Press Enter twice to finish):"
+            print_header
             log_message=""
             while IFS= read -r line; do
                 # se a linha é vazia, sai do loop
