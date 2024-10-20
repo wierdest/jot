@@ -73,6 +73,7 @@ print_recent_log_line() {
     three_hours_ago=$(date --date='-3 hour' '+%H')
 
     # extrai o time stamp e a mensagem da linha
+    log_date=$(echo "$1" | awk '{print $1}')
     log_time=$(echo "$1" | awk '{print $2}')
     log_hour=$(echo "$log_time" | cut -d':' -f1)
     message=$(echo "$1" | cut -d' ' -f3-)
@@ -82,10 +83,10 @@ print_recent_log_line() {
         echo -e "${YELLOW}${log_time}${RESET} ${message}"
     # Verifica se é dentro das últimas 3 horas
     elif [[ "$log_hour" -ge "$three_hours_ago" && "$log_hour" -lt "$current_hour" ]]; then
-        echo -e "${BLUE}${log_time}${RESET} ${message}"
+        echo -e "${BLUE}${log_date} ${log_time}${RESET} ${message}"
     # Logs mais antigos que 3 horas
     else
-        echo -e "${MAGENTA}${log_time}${RESET} ${message}"
+        echo -e "${MAGENTA}${log_date} ${log_time}${RESET} ${message}"
     fi
 }
 
