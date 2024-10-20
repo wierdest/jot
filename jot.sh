@@ -187,7 +187,7 @@ clear_last() {
 	sed -i '$d' "$LOG_FILE"
 	echo "Last log entry deleted!"
    else
-	echo "Log file is empty! Nothing to delete!"
+	echo -e "${RED}Log file is empty! Nothing to delete!${RESET}"
    fi
 }
 
@@ -195,7 +195,7 @@ clear_last() {
 clear_logs() {
     # usa noop operator como o linter sugeriu
     : > "$LOG_FILE"
-    echo "Log entries cleared!"
+    echo -e -e "${GREEN}Log entries cleared!${RESET}" 
 }
 
 # Mostra ajuda de utilização

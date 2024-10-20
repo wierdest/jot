@@ -1,10 +1,10 @@
 # jot
-A simple Bash script for a truly minimal command-line logging utility. 
+A Bash script for a command-line logging utility. 
 
 ## Overview
-`jot` is a truly minimal command-line logging utility.
-- it's a very simple Bash script.
-- it comes with a installer script that automates the creation of a function
+`jot` is command-line logging utility.
+- it does not use an external editor for writing or reading messages
+- it comes with a installer script that automates the creation of a function in your .bashrc:
 ```
 # jot is a logging utility. jot -h for usage info.
 jot() {
