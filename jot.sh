@@ -80,7 +80,7 @@ print_recent_log_line() {
 
     # Verifica se a hora do log é da última hora
     if [[ "$log_hour" == "$current_hour" ]]; then
-        echo -e "${YELLOW}${log_time}${RESET} ${message}"
+        echo -e "${YELLOW}${log_date} ${log_time}${RESET} ${message}"
     # Verifica se é dentro das últimas 3 horas
     elif [[ "$log_hour" -ge "$three_hours_ago" && "$log_hour" -lt "$current_hour" ]]; then
         echo -e "${BLUE}${log_date} ${log_time}${RESET} ${message}"
