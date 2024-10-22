@@ -18,7 +18,7 @@ RED="\e[31m"
 GREEN="\e[32m"
 YELLOW="\e[33m"
 BLUE="\e[34m"
-MAGENTA="\e[35m"
+MAGENTA="\e[35m" 
 CYAN="\e[36m"
 WHITE="\e[37m"
 
@@ -62,17 +62,25 @@ print_general_log_line() {
     # a gente precisa do -d do cut para marcar que o delimitador será o espaco, 
     # que delimita a data, a hora e o - separador.
     message=$(echo "$1" | cut -d' ' -f3-)
+    topic=$(echo "$message" | awk -F'|' '{print $2}' | xargs)
+    content=$(echo "$message" | awk -F'|' '{print $3}' | xargs)
     if [[ "$log_date" == "$today" ]]; then
         # se for hoje faz o print em BLUE
         # a não ser que seja na última hora, ocasião que faz o print em YELLOW
         if [[ "$log_hour" == "$current_hour" ]]; then
-            echo -e "${YELLOW}${log_date} ${log_time}${RESET} ${message}"
+            echo -e "${YELLOW}${log_date} ${log_time}"
+            echo -e "${BLACK}| ${topic} |${RESET}"
+            echo -e "${content}"
         else
-            echo -e "${BLUE}${log_date} ${log_time}${RESET} ${message}"
+            echo -e "${BLUE}${log_date} ${log_time}${RESET}"
+            echo -e "${BLACK}| ${topic} |${RESET}"
+            echo -e "${content}"
         fi
     else
         # se for ontem ou anterior
-        echo -e "${MAGENTA}${log_date} ${log_time}${RESET} ${message}"
+        echo -e "${MAGENTA}${log_date} ${log_time}${RESET}"
+        echo -e "${BLACK}| ${topic} |${RESET}"
+        echo -e "${content}"
     fi
 }
 
@@ -88,16 +96,24 @@ print_recent_log_line() {
     log_time=$(echo "$1" | awk '{print $2}')
     log_hour=$(echo "$log_time" | cut -d':' -f1)
     message=$(echo "$1" | cut -d' ' -f3-)
+    topic=$(echo "$message" | awk -F'|' '{print $2}' | xargs)
+    content=$(echo "$message" | awk -F'|' '{print $3}' | xargs)
 
     # Verifica se a hora do log é da última hora
     if [[ "$log_hour" == "$current_hour" ]]; then
-        echo -e "${YELLOW}${log_date} ${log_time}${RESET} ${message}"
+        echo -e "${YELLOW}${log_date} ${log_time}"
+        echo -e "${BLACK}| ${topic} |${RESET}"
+        echo -e "${content}"
     # Verifica se é dentro das últimas 3 horas
     elif [[ "$log_hour" -ge "$three_hours_ago" && "$log_hour" -lt "$current_hour" ]]; then
-        echo -e "${BLUE}${log_date} ${log_time}${RESET} ${message}"
+        echo -e "${BLUE}${log_date} ${log_time}${RESET}"
+        echo -e "${BLACK}| ${topic} |${RESET}"
+        echo -e "${content}"
     # Logs mais antigos que 3 horas
     else
-        echo -e "${MAGENTA}${log_date} ${log_time}${RESET} ${message}"
+        echo -e "${MAGENTA}${log_date} ${log_time}${RESET}"
+        echo -e "${BLACK}| ${topic} |${RESET}"
+        echo -e "${content}"
     fi
 }
 
@@ -221,7 +237,7 @@ show_help() {
     echo -e "${YELLOW} -y---------------${BLUE} View yesterday's entries"
     echo -e "${YELLOW} -v---------------${BLUE} View all log entries"
     echo -e "${YELLOW} -d---------------${BLUE} Clear last log entry" 
-    echo -e "${YELLOW} -c---------------${BLUE}Clear all log entries with no warning ${RED}BEWARE!${RESET}"
+    echo -e "${YELLOW} -c---------------${BLUE} Clear all log entries with no warning ${RED}BEWARE!${RESET}"
 }
 
 
@@ -231,20 +247,19 @@ while getopts "altyvr:s:dch" option; do
         a)
             # confere se há um tópico e oferece para mudar ou não
             CURRENT_TOPIC=$(extract_topic)
-            echo "$CURRENT_TOPIC"
-
             if [[ -n $CURRENT_TOPIC ]]; then
-                echo -e "${CYAN}Topic: '${GREEN}${CURRENT_TOPIC}${CYAN}'. Add new?${BLACK} Press Enter to use current${RESET}."
+                echo -e "${CYAN}Topic: '${GREEN}${CURRENT_TOPIC}${CYAN}'. Add new?${BLACK} Leave it blank to use current...${RESET}"
                 read -r new_topic
                 if [[ -n "$new_topic" ]]; then
+                    echo -e "${CYAN}Topic set to: '${GREEN}${new_topic}${CYAN}'."
                     CURRENT_TOPIC="$new_topic"
                 fi
             else
                 while [[ -z "$CURRENT_TOPIC" ]]; do
-                    echo "No topic found. Please enter a new topic:"
+                    echo -e "${RED}No topic found. Please enter a new topic:${RESET}"
                     read -r CURRENT_TOPIC
                     if [[ -z "$CURRENT_TOPIC" ]]; then
-                        echo "Topic cannot be empty. Please provide a valid topic."
+                        echo -e "${RED}Topic cannot be empty. Please provide a valid topic.${RESET}"
                     fi
                 done
             fi

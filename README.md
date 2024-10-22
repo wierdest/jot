@@ -4,7 +4,7 @@ A Bash script for a command-line logging utility.
 ## Overview
 `jot` is command-line logging utility.
 - it does not use an external editor for writing or reading messages
-- it comes with a installer script that automates the creation of a function in your .bashrc:
+- it comes with a installer script that automates the creation of this function in your .bashrc:
 ```
 # jot is a logging utility. jot -h for usage info.
 jot() {
@@ -13,10 +13,6 @@ jot() {
     sed -i '$d' ~/.bash_history
 }
 ```
-
-in your ./.bashrc
-
-
 ## Installation
 1. Download jot.sh
 2. Place it in your $HOME.
@@ -30,15 +26,45 @@ Now you can type `jot -h` to find out about usage.
 jot creates a jot.txt file in your $HOME, that's where it keeps all your jots.
 
 ## Usage
+`jot` followed by one of the options:
 
 - -a 'press enter': enter jot log message prompt.
-- -v : View all log entries.
 - -s 'keyword' : Search log entries for a specific keyword.
+- -r 'n': View -n log entries from the most recent to the oldest.
+- -v : View all log entries.
 - -c : Clear all log entries.
 - -t : View logs from today.
 - -y : View logs from yesterday.
 - -d : Delete the last log entry.
 - -h : Show help information.
+
+## Writing
+`jot` asks for a topic if it's your first input:
+
+```
+No topic found. Please enter a new topic:
+
+```
+- if it's not your first message, it shows you the last topic and present the opportunity to change it:
+
+```
+Topic: 'MY FIRST TOPIC'. Add new? Leave it blank to use current...
+
+```
+## Reading
+
+`jot` colors the logs according to timestamp. 
+- it follows the color convention: YELLOW for most recent, BLUE for less and MAGENTA for older messages.
+- there are two ways of viewing messages:
+`jot -v` conventions:
+    >> most recent: logs within the current hour
+    >> less recent: logs within the same day
+`jot -r -n` conventions:
+    >> most recent: logs within the current hour
+    >> less recent: logs within three hours
+- 
+
+
 
 ## Example output of jot -v
 ```
