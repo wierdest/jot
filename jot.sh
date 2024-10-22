@@ -27,11 +27,22 @@ RESET="\e[0m"
 # formato do nosso timestamp
 TIMESTAMP="$(date '+%Y-%m-%d %H:%M:%S')"
 
-
 # Adiciona um log
 add_log() {
-    echo "${TIMESTAMP} - $1" >> "$LOG_FILE"
+    echo "${TIMESTAMP} | ${CURRENT_TOPIC} | $1" >> "$LOG_FILE"
     echo -e "${CYAN}Log added:${RESET} ${GREEN}$1${RESET}"
+}
+
+# Extrai o tópico do último log
+extract_topic() {
+    if [[ -s $LOG_FILE ]]; then
+        last_log=$(tail -n 1 "$LOG_FILE")
+        # usa o pipe para jogar a ultima linha para o awk, que joga para xargs fazer trim
+        last_topic=$(echo "$last_log" | awk -F'|' '{print $2}' | xargs)
+        echo "$last_topic"
+    else
+        echo ""
+    fi
 }
 
 # Imprime o log de acordo com o esquema de cor geral: MAGENTA para velhas, BLUE para hj e YELLOW para a ultima hora
@@ -185,7 +196,7 @@ clear_last() {
    if [[ -s $LOG_FILE ]]; then
 	# Remove a ultima linha do arquivo de log
 	sed -i '$d' "$LOG_FILE"
-	echo "Last log entry deleted!"
+	echo -e "${GREEN}Last log entry deleted!${RESET}"
    else
 	echo -e "${RED}Log file is empty! Nothing to delete!${RESET}"
    fi
@@ -200,23 +211,43 @@ clear_logs() {
 
 # Mostra ajuda de utilização
 show_help() {
-    echo "Usage: $0 [options]"
-    echo "Options :"
-    echo " -a 'press enter' Jot log message prompt"
-    echo " -l View last entry"
-    echo " -t View today's entries"
-    echo " -y View yesterday's entries"
-    echo " -v View all log entries"
-    echo " -r 'n' View a number n of recent entries" 
-    echo " -s 'keyword' Search log entries for keyword"
-    echo " -d Clear last log entry" 
-    echo " -c Clear all log entries with no warning BEWARE!"
+    echo -e "${CYAN}Usage: jot [options]"
+    echo -e "Options:"
+    echo -e "${YELLOW} -a-'press enter'-${BLUE} Jot log message prompt"
+    echo -e "${YELLOW} -s-'keyword'-----${BLUE} Search log entries for keyword"
+    echo -e "${YELLOW} -r-'n'-----------${BLUE} View a number n of recent entries" 
+    echo -e "${YELLOW} -l---------------${BLUE} View last entry"
+    echo -e "${YELLOW} -h---------------${BLUE} View today's entries"
+    echo -e "${YELLOW} -y---------------${BLUE} View yesterday's entries"
+    echo -e "${YELLOW} -v---------------${BLUE} View all log entries"
+    echo -e "${YELLOW} -d---------------${BLUE} Clear last log entry" 
+    echo -e "${YELLOW} -c---------------${BLUE}Clear all log entries with no warning ${RED}BEWARE!${RESET}"
 }
+
 
 # Usa getopts para parse das opções
 while getopts "altyvr:s:dch" option; do
     case $option in
         a)
+            # confere se há um tópico e oferece para mudar ou não
+            CURRENT_TOPIC=$(extract_topic)
+            echo "$CURRENT_TOPIC"
+
+            if [[ -n $CURRENT_TOPIC ]]; then
+                echo -e "${CYAN}Topic: '${GREEN}${CURRENT_TOPIC}${CYAN}'. Add new?${BLACK} Press Enter to use current${RESET}."
+                read -r new_topic
+                if [[ -n "$new_topic" ]]; then
+                    CURRENT_TOPIC="$new_topic"
+                fi
+            else
+                while [[ -z "$CURRENT_TOPIC" ]]; do
+                    echo "No topic found. Please enter a new topic:"
+                    read -r CURRENT_TOPIC
+                    if [[ -z "$CURRENT_TOPIC" ]]; then
+                        echo "Topic cannot be empty. Please provide a valid topic."
+                    fi
+                done
+            fi
             print_header
             log_message=""
             while IFS= read -r line; do
@@ -229,7 +260,7 @@ while getopts "altyvr:s:dch" option; do
             if [[ -n "$log_message" ]]; then
                 add_log "$log_message"
             else
-                echo "No log message entered. Please provide a message."
+                echo -e "${RED}No log message entered. Please provide a message.${RESET}"
             fi
             ;;
         l)
