@@ -69,11 +69,11 @@ print_general_log_line() {
         # a não ser que seja na última hora, ocasião que faz o print em YELLOW
         if [[ "$log_hour" == "$current_hour" ]]; then
             echo -e "${YELLOW}${log_date} ${log_time}"
-            echo -e "${BLACK}| ${topic} |${RESET}"
+            echo -e "${WHITE}| ${topic} |${RESET}"
             echo -e "${content}"
         else
             echo -e "${BLUE}${log_date} ${log_time}${RESET}"
-            echo -e "${BLACK}| ${topic} |${RESET}"
+            echo -e "${WHITE}| ${topic} |${RESET}"
             echo -e "${content}"
         fi
     else
@@ -107,12 +107,12 @@ print_recent_log_line() {
     # Verifica se é dentro das últimas 3 horas
     elif [[ "$log_hour" -ge "$three_hours_ago" && "$log_hour" -lt "$current_hour" ]]; then
         echo -e "${BLUE}${log_date} ${log_time}${RESET}"
-        echo -e "${BLACK}| ${topic} |${RESET}"
+        echo -e "${WHITE}| ${topic} |${RESET}"
         echo -e "${content}"
     # Logs mais antigos que 3 horas
     else
         echo -e "${MAGENTA}${log_date} ${log_time}${RESET}"
-        echo -e "${BLACK}| ${topic} |${RESET}"
+        echo -e "${WHITE}| ${topic} |${RESET}"
         echo -e "${content}"
     fi
 }
